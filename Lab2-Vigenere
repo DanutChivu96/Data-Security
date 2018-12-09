@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <string.h>
+#include <cs50.h>
+#include <ctype.h>
+
+
+int valid_command(string cmd);
+int* convert_key (string cmd);
+int length (string cmd);
+
+int main (int argc, string argv[]){
+    int cmd = valid_command(argv[1]);
+
+    if ((argc != 2) || cmd){
+        printf("Error: Not valid input!\n");
+        return 1;
+    }
+    else{
+        printf("plaintext: ");
+        string plaintext = get_string();
+        int size = length(argv[1]);  //save the length of the key
+
+        int* delta = convert_key(argv[1]);
+
+        int* cipher = (int*)malloc((size+1)*sizeof(int));
+        int* cipher_ptr = cipher;
+        char* p_ptr = plaintext;
+
+        if (plaintext != NULL){
+            int i = 0;
+            while ((*p_ptr) != '\0'){
+                if (i == size){
+                    i = 0;
+                }
+                if (isalpha(*p_ptr)){
+                    //if element is in A-Z range:
+                    if (isupper(*p_ptr)){
+                        *cipher_ptr = ((((*p_ptr)-65)+(delta[i]))%26) + 65;
+                        p_ptr++;
+                        cipher_ptr++;
+                        i++;
+                    }
+                    else {
+                        *cipher_ptr = ((((*p_ptr)-97)+(delta[i]))%26) + 97;
+                         p_ptr++;
+                        cipher_ptr++;
+                        i++;
+                    }
+                }
+                else {
+                    *cipher_ptr = *p_ptr;
+                    p_ptr++; 
+                    cipher_ptr++;
+                }
+            }
+        }
+        else {
+            return 1;
+        }
+
+
+
+        printf("ciphertext: ");
+
+        char ciphertext [length(plaintext)];
+
+        for (int i = 0; i < length(plaintext); i++){
+            ciphertext[i] = *cipher;
+            cipher++;
+            printf("%c",ciphertext[i]);
+        }
+        printf("\n");
+
+        return 0;
+    }
+
+}
+
+int* convert_key (string cmd){
+    char* ptr = cmd;
+    int* array = (int*) malloc(strlen(cmd)*sizeof(int));
+    int* array_ptr = array;
+    while ((*ptr) != '\0'){
+        *array_ptr = (toupper((*ptr))-65);
+        ptr++;
+        array_ptr++;
+    }
+    return array;
+}
+
+
+int valid_command(string cmd){
+    char* ptr = cmd;
+    if (ptr != NULL){
+        while ((*ptr) != '\0'){
+            int value = (toupper((*ptr))-65);
+            if ((value > 25) || (value < 0)){
+                return 1;
+            }
+            else {
+                ptr++;
+            }
+        }
+        return 0;
+    }
+    else{
+        return 1; 
+    }
+}
